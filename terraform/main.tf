@@ -48,3 +48,13 @@ resource "aws_lambda_layer_version" "lib_layer" {
 
   compatible_runtimes = ["python3.7"]
 }
+
+
+resource "aws_s3_bucket" "awsdx_data_bucket" {
+  bucket = "awsdx-data-bucket"
+}
+
+resource "aws_athena_database" "awsdx_db" {
+  name   = "awsdx_db"
+  bucket = aws_s3_bucket.awsdx_data_bucket.bucket
+}
