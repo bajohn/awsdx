@@ -41,6 +41,15 @@ resource "aws_iam_role" "iam_for_lambda_default" {
 EOF
 }
 
+resource "aws_iam_policy_attachment" "iam_for_lambda_default_attach" {
+  name       = "IAM for lambda default policy attachment"
+  roles      = [aws_iam_role.iam_for_lambda_default.name]
+  policy_arn = "arn:aws:iam::aws:policy/AWSDataExchangeFullAccess"
+}
+
+
+
+
 resource "aws_lambda_layer_version" "lib_layer" {
   s3_bucket = "awsdx-lambda-code-bucket"
   s3_key = local.lib_filename 

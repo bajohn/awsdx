@@ -64,3 +64,6 @@ do
         aws s3 cp $file_inner s3://$S3_BUCKET_NAME/$S3_KEY
     fi
 done
+
+cd terraform
+terraform apply -auto-approve 
