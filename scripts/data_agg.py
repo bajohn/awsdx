@@ -14,11 +14,16 @@ def main():
 
     revisions = data_source_revisions(dxClient, nasdaq_data_id)
 
-    revision1 = revisions[0]
+    revisions = revisions[:5]
+    print(len(revisions))
 
-    s3Key = dxS3Key(revision1, 'awsdx-data-bucket',
-                    'securities_data/', dxClient)
-    print(f'Done {s3Key}')
+    jobObjs = [dxS3Jobs(revision, 'awsdx-data-bucket',
+                        'securities_data/', dxClient) for revision in revisions]
+
+    awaitJobs(jobObjs, dxClient)
+
+    uncompressFiles(jobObjs)
+    print('Done')
 
     return 'Done'
 
@@ -30,8 +35,20 @@ def main():
     # f.close()
 
 
+def uncompressFiles(jobObjs):
+    for jobObj in jobObjs:
+        unzip_file(jobObj['fileLocation'])
+
+
+def awaitJobs(jobObjs, dxClient):
+    for jobObj in jobObjs:
+        while not jobComplete(jobObj['jobId'], dxClient):
+            time.sleep(1)
+
 # data exchange object -> s3
-def dxS3Key(dxObj, s3Bucket, s3Prefix, dxClient):
+
+
+def dxS3Jobs(dxObj, s3Bucket, s3Prefix, dxClient):
     name = dxObj['Comment']
     revisionId = dxObj['Id']
     dataSetId = dxObj['DataSetId']
@@ -56,7 +73,6 @@ def dxS3Key(dxObj, s3Bucket, s3Prefix, dxClient):
             ]
         )
     )
-    # print(createRequest)
 
     resp = dxClient.create_job(
         Details=createRequest, Type='EXPORT_ASSETS_TO_S3')
@@ -66,12 +82,12 @@ def dxS3Key(dxObj, s3Bucket, s3Prefix, dxClient):
         JobId=jobId
     )
 
-    while not jobComplete(jobId, dxClient):
-        time.sleep(1)
+    fileLocation = f's3://{s3Bucket}/{s3Key}'
 
-    unzip_file(s3Bucket, s3Key)
-
-    return s3Key
+    return dict(
+        fileLocation=fileLocation,
+        jobId=jobId
+    )
 
 
 def jobComplete(jobId, dxClient):
@@ -81,9 +97,10 @@ def jobComplete(jobId, dxClient):
     return state == 'COMPLETED'
 
 
-def unzip_file(bucket, key):
-    s3Client = boto3.client('s3')
-    fileLocation = f's3://{bucket}/{key}'
+def unzip_file(fileLocation):
+    # s3Client = boto3.client('s3')
+    #fileLocation = f's3://{bucket}/{key}'
+    print(f'Unzipping {fileLocation}')
     with open(fileLocation, 'rb') as zippedFile:
         decompressedFile = gzip.decompress(zippedFile.read())
         with open(fileLocation, 'wb') as outfile:
