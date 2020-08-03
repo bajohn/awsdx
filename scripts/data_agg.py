@@ -8,17 +8,18 @@ def main():
 
     dxClient = boto3.client('dataexchange')
 
-    nasdaq_data_id = '7f9633003e50399a699344131fdf3b73'
-    bucket = 'awsdx-data-bucket'
-    key = 'securities_data/Equities_XNAS_20200311.csv'
+    NASDAQ_DATA_SET_ID = '7f9633003e50399a699344131fdf3b73'
 
-    revisions = data_source_revisions(dxClient, nasdaq_data_id)
+    BUCKET = 'awsdx-data-bucket'
+    S3_OUT_PREFIX = 'securities_data/'
 
-    revisions = revisions[:5]
-    print(len(revisions))
+    revisions = data_source_revisions(dxClient, NASDAQ_DATA_SET_ID)
 
-    jobObjs = [dxS3Jobs(revision, 'awsdx-data-bucket',
-                        'securities_data/', dxClient) for revision in revisions]
+    # revisions = revisions[:5]
+    print(f'Number of jobs expected: {len(revisions)}')
+
+    jobObjs = [dxS3Jobs(revision, BUCKET, S3_OUT_PREFIX, dxClient)
+               for revision in revisions]
 
     awaitJobs(jobObjs, dxClient)
 
@@ -26,13 +27,6 @@ def main():
     print('Done')
 
     return 'Done'
-
-    #     f = gzip.open('Equities_XNAS_20200311.csv', 'rb')
-    #     file_content = f.read()
-    # print(file_content)
-    # with open('outfile.csv', 'wb+') as outfile:
-    #     outfile.write(file_content)
-    # f.close()
 
 
 def uncompressFiles(jobObjs):
@@ -83,7 +77,7 @@ def dxS3Jobs(dxObj, s3Bucket, s3Prefix, dxClient):
     )
 
     fileLocation = f's3://{s3Bucket}/{s3Key}'
-
+    print(f'Job created for {fileLocation}')
     return dict(
         fileLocation=fileLocation,
         jobId=jobId
@@ -102,9 +96,12 @@ def unzip_file(fileLocation):
     #fileLocation = f's3://{bucket}/{key}'
     print(f'Unzipping {fileLocation}')
     with open(fileLocation, 'rb') as zippedFile:
-        decompressedFile = gzip.decompress(zippedFile.read())
-        with open(fileLocation, 'wb') as outfile:
-            return outfile.write(decompressedFile)
+        try:
+            decompressedFile = gzip.decompress(zippedFile.read())
+            with open(fileLocation, 'wb') as outfile:
+                return outfile.write(decompressedFile)
+        except gzip.BadGzipFile:
+            print(f'Bad gzip file, skipping: {fileLocation}')
 
 
 def data_source_meta(client):
