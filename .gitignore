@@ -2,3 +2,4 @@ out
 terraform/.terraform
 .vscode/
 .DS_Store
+data

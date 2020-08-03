@@ -3,25 +3,28 @@ import gzip
 import time
 from smart_open import open as open
 
-
+# Move AWS Data Exchange data to S3.
 def main():
+    # '7f9633003e50399a699344131fdf3b73'
+    DATA_SET_ID = '1ad70973c01fac6ad3a331500c8a1d80'
+    BUCKET = 'awsdx-data-bucket'
+    S3_OUT_PREFIX = 'energy_data'  # 'securities_data/'
+    WAIT_SECS = 10
+    MOVE_ONE = True #Only move the latest revision to S3.
 
     dxClient = boto3.client('dataexchange')
 
-    NASDAQ_DATA_SET_ID = '7f9633003e50399a699344131fdf3b73'
+    revisions = data_source_revisions(dxClient, DATA_SET_ID)
+    if MOVE_ONE:
+        revisions = revisions[:1]
+        print(revisions)
 
-    BUCKET = 'awsdx-data-bucket'
-    S3_OUT_PREFIX = 'securities_data/'
-
-    revisions = data_source_revisions(dxClient, NASDAQ_DATA_SET_ID)
-
-    # revisions = revisions[:5]
     print(f'Number of jobs expected: {len(revisions)}')
 
     jobObjs = [dxS3Jobs(revision, BUCKET, S3_OUT_PREFIX, dxClient)
                for revision in revisions]
 
-    awaitJobs(jobObjs, dxClient)
+    awaitJobs(jobObjs, dxClient, WAIT_SECS)
 
     uncompressFiles(jobObjs)
     print('Done')
@@ -34,10 +37,10 @@ def uncompressFiles(jobObjs):
         unzip_file(jobObj['fileLocation'])
 
 
-def awaitJobs(jobObjs, dxClient):
+def awaitJobs(jobObjs, dxClient, waitSecs):
     for jobObj in jobObjs:
         while not jobComplete(jobObj['jobId'], dxClient):
-            time.sleep(1)
+            time.sleep(waitSecs)
 
 # data exchange object -> s3
 

@@ -16,6 +16,9 @@ Free data only, preferably with at least 1 year
 - See about predictive modeling between Fed data and Equity EOD data.
 - Debit, Credit data: Experian, Facteus
 
+Euro energy data background:
+- Translate types: https://dd.eionet.europa.eu/vocabulary/eurostat/siec/view
+- Crappy existing data explorer https://appsso.eurostat.ec.europa.eu/nui/show.do?dataset=nrg_ind_peh&lang=en
 
 ## TODO
 - Look up Crux (featured provider!) for great financial data. Also great energy sector data! 
