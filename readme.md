@@ -24,6 +24,19 @@ Euro energy data background:
 - Look up Crux (featured provider!) for great financial data. Also great energy sector data! 
 - Reach out to Crux, what's up with subscription request.
 
+- Fed ownership vs economy? Here's key for  `"awsdx_db"."gov_ownership_stats"`
+```
+Total consumer credit owned by federal government, not seasonally adjusted level
+tccobfg
+Nonrevolving consumer credit owned by federal government, not seasonally adjusted level
+nrccobfgnsal
+Total consumer credit owned by federal government, not seasonally adjusted flow, monthly rate
+tccobfgnsafmr
+Nonrevolving consumer credit owned by federal government, not seasonally adjusted flow, monthly rate
+nrccobfgnsafmr
+```
+
+
 ## Dead Ideas
 - Correlate shipping data with something
 - [Shipping Data](https://aws.amazon.com/marketplace/pp/prodview-2yx6pwjzh23bo?qid=1595467629281&sr=0-10&ref_=srh_res_product_title)
