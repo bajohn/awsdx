@@ -1,5 +1,10 @@
 
 
+# RIP
+
+Didn't end up submitting, life got in the way!
+
+
 # AWS Data Exchange Hackathon 
 Repo for hackathon described here:
 https://awsdataexchange.devpost.com/
