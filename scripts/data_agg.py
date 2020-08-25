@@ -3,14 +3,27 @@ import gzip
 import time
 from smart_open import open as open
 
-# Move AWS Data Exchange data to S3.
+'''
+Move AWS Data Exchange data to S3.
+Usage:
+Set the following parameters
+DATA_SET_ID: the Data Set ID from AWS Data Exchange
+S3_OUT_PREFIX: beginning of S3 key, should end with '/'
+BUCKET: S3 Bucket
+
+Run from CLI using:
+$ pipenv run python scripts/data_agg.py
+'''
+
+
 def main():
-    # '7f9633003e50399a699344131fdf3b73'
-    DATA_SET_ID = '1ad70973c01fac6ad3a331500c8a1d80'
+
+    DATA_SET_ID = 'a7705ab9657df42a51f8b8d598de72d0'
+    S3_OUT_PREFIX = 'cbp/'  # 'securities_data/'
+
     BUCKET = 'awsdx-data-bucket'
-    S3_OUT_PREFIX = 'energy_data'  # 'securities_data/'
     WAIT_SECS = 10
-    MOVE_ONE = True #Only move the latest revision to S3.
+    MOVE_ONE = True  # Only move the latest revision to S3.
 
     dxClient = boto3.client('dataexchange')
 
