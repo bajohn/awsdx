@@ -18,8 +18,8 @@ $ pipenv run python scripts/data_agg.py
 
 def main():
 
-    DATA_SET_ID = 'a7705ab9657df42a51f8b8d598de72d0'
-    S3_OUT_PREFIX = 'cbp/'  # 'securities_data/'
+    DATA_SET_ID = 'd0e9bd6148e8f14889980954017b0927'
+    S3_OUT_PREFIX = 'cbp2020/'  # 'securities_data/'
 
     BUCKET = 'awsdx-data-bucket'
     WAIT_SECS = 10
@@ -30,22 +30,23 @@ def main():
     revisions = data_source_revisions(dxClient, DATA_SET_ID)
     if MOVE_ONE:
         revisions = revisions[:1]
-        print(revisions)
 
     print(f'Number of jobs expected: {len(revisions)}')
-
-    jobObjs = [dxS3Jobs(revision, BUCKET, S3_OUT_PREFIX, dxClient)
-               for revision in revisions]
-
+    jobObjs = []
+    for revision in revisions:
+        jobObjs += dxS3Jobs(revision, BUCKET, S3_OUT_PREFIX, dxClient)
+    # jobObjs = [dxS3Jobs(revision, BUCKET, S3_OUT_PREFIX, dxClient)
+    #            for revision in revisions]
+    print(jobObjs)
     awaitJobs(jobObjs, dxClient, WAIT_SECS)
 
-    uncompressFiles(jobObjs)
+    # decompressFiles(jobObjs)
     print('Done')
 
     return 'Done'
 
 
-def uncompressFiles(jobObjs):
+def decompressFiles(jobObjs):
     for jobObj in jobObjs:
         unzip_file(jobObj['fileLocation'])
 
@@ -59,7 +60,8 @@ def awaitJobs(jobObjs, dxClient, waitSecs):
 
 
 def dxS3Jobs(dxObj, s3Bucket, s3Prefix, dxClient):
-    name = dxObj['Comment']
+    print(dxObj)
+
     revisionId = dxObj['Id']
     dataSetId = dxObj['DataSetId']
 
@@ -67,37 +69,43 @@ def dxS3Jobs(dxObj, s3Bucket, s3Prefix, dxClient):
         DataSetId=dataSetId,
         RevisionId=revisionId
     )
-
-    assetid = revisionAssets['Assets'][0]['Id']
-    s3Key = s3Prefix + name
-    createRequest = dict(
-        ExportAssetsToS3=dict(
-            DataSetId=dataSetId,
-            RevisionId=revisionId,
-            AssetDestinations=[
-                dict(
-                    AssetId=assetid,
-                    Bucket=s3Bucket,
-                    Key=s3Key,
-                )
-            ]
+    print(revisionAssets)
+    ret = []
+    for asset in revisionAssets['Assets']:
+        print(asset)
+        assetid = asset['Id']
+        name = asset['Name']
+        s3Key = s3Prefix + name
+        createRequest = dict(
+            ExportAssetsToS3=dict(
+                DataSetId=dataSetId,
+                RevisionId=revisionId,
+                AssetDestinations=[
+                    dict(
+                        AssetId=assetid,
+                        Bucket=s3Bucket,
+                        Key=s3Key,
+                    )
+                ]
+            )
         )
-    )
 
-    resp = dxClient.create_job(
-        Details=createRequest, Type='EXPORT_ASSETS_TO_S3')
+        resp = dxClient.create_job(
+            Details=createRequest, Type='EXPORT_ASSETS_TO_S3')
 
-    jobId = resp['Id']
-    dxClient.start_job(
-        JobId=jobId
-    )
+        jobId = resp['Id']
+        dxClient.start_job(
+            JobId=jobId
+        )
 
-    fileLocation = f's3://{s3Bucket}/{s3Key}'
-    print(f'Job created for {fileLocation}')
-    return dict(
-        fileLocation=fileLocation,
-        jobId=jobId
-    )
+        fileLocation = f's3://{s3Bucket}/{s3Key}'
+        print(f'Job created for {fileLocation}')
+        ret += dict(
+            fileLocation=fileLocation,
+            jobId=jobId
+        )
+
+    return ret
 
 
 def jobComplete(jobId, dxClient):

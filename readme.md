@@ -17,6 +17,7 @@ Deadline: 5:00pm EDT Aug 24, 2020
 
 ## Ideas
 Free data only, preferably with at least 1 year 
+- Amazing CBP data. Infographic for countries->US shipping through 2020.
 
 - See about predictive modeling between Fed data and Equity EOD data.
 - Debit, Credit data: Experian, Facteus
