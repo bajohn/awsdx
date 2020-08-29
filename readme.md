@@ -47,6 +47,7 @@ Front end can store in a giant FIFO queue
 Front end: 
 - Use mapbox API, show dots indicating size of ship based on kg
 - Use typical ship speed interpolated from arrival date to "simulate" voyage. Randomize radial angle (?) to spread out ships approaching the same port (should decide how to do this)
+- Mapbox JS https://docs.mapbox.com/mapbox-gl-js/api/, just got API key and account under brendanajohn
 - Bonus: show big queue on sidebar, would be really satisfying.
 
 
