@@ -4,24 +4,30 @@
 </div>
 
 
-<mgl-map (load)="saveMap($event)" class="mapbox-container" [style]="'mapbox://styles/mapbox/streets-v9'" [zoom]="[2]" [center]=defaultCenter>
+<mgl-map (load)="saveMap($event)" class="mapbox-container" [style]="'mapbox://styles/mapbox/streets-v9'" [zoom]="[2]"
+  [center]=defaultCenter>
 
   <ng-container *ngFor="let obj of shipArr">
 
-    <mgl-geojson-source [id]="obj.srcId" [data]="obj.sourceData"> </mgl-geojson-source>
-    <mgl-layer [id]="obj.ptId" type="circle" [source]="obj.srcId" [paint]="{
-      'circle-radius': 10,
-      'circle-color': '#007cbf'
-    }"> </mgl-layer>
+    <ng-container *ngIf="showGraphics(obj.endDate)">
 
-    <mgl-layer id="obj.lineId" type="line" [source]="lineSource(obj.startCoord, obj.endCoord)" [layout]="{
-      'line-join': 'round',
-      'line-cap': 'round'
-    }" [paint]="{
-      'line-color': '#888',
-      'line-width': 8
-    }">
-    </mgl-layer>
+      <mgl-geojson-source [id]="obj.srcId" [data]="obj.sourceData"> </mgl-geojson-source>
+      <mgl-layer [id]="obj.ptId" type="circle" [source]="obj.srcId" [paint]="{
+        'circle-radius': 10,
+        'circle-color': '#007cbf'
+      }"> </mgl-layer>
+
+      <!-- <mgl-layer id="obj.lineId" type="line" [source]="lineSource(obj.startCoord, obj.endCoord)" [layout]="{
+        'line-join': 'round',
+        'line-cap': 'round'
+      }" [paint]="{
+        'line-color': '#888',
+        'line-width': 8
+      }">
+    </mgl-layer> -->
+
+    </ng-container>
+
 
   </ng-container>
 

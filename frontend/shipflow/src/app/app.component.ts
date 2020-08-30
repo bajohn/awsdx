@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 
 import { v4 as uuidv4 } from 'uuid';
 
-import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { Map } from 'mapbox-gl';
 
 
@@ -14,14 +13,13 @@ import { Map } from 'mapbox-gl';
 export class AppComponent implements OnInit {
   readonly accessToken = 'pk.eyJ1IjoiYnJlbmRhbmFqb2huIiwiYSI6ImNrZWM1aHkwZjA0YzIydHJzaTdudHA5cjQifQ.ogTyplFS7LdAC7QspnVVkQ';
   testPoint: GeoJSON.Point = { type: 'Point', coordinates: [0, 0] };
-  defaultCenter = [-77.0366, 38.895]; //[-98.585522, 39.8333333];
-  //londonishCenter = [0, 51.5];
+  defaultCenter = [-98.585522, 39.8333333]; //[-77.0366, 38.895]; // Assumes Kansas!
 
-  appTime = new Date('2020-08-23');
-  timeRate = 2;// clock seconds per app day
-  updateRate = 100;// rerenders per second
+  appTime = new Date('2020-08-29');
+  timeRate = 10;// clock seconds per app day
+  updateRate = 10;// rerenders per second
   shipSpeed = 37; // 37 kph is approx 20 knots 
-  daysToShow = 7; // number of days to show a ship for
+  daysToShow = 2; // number of days to show a ship for
 
   map: Map;
 
@@ -47,25 +45,24 @@ export class AppComponent implements OnInit {
     // start app clock
     setInterval(() => { this.updateAppTime() }, 1000 / this.updateRate)
 
-    const startLoc = 'brasilia';
-    const endLoc = 'new york';
-    const endDate = new Date();
-    const testObj = await this.initShipObj(startLoc, endLoc, endDate);
-    this.shipArr.push(testObj);
+    // 
+    this.debugArray();
+
   }
 
+  async debugArray() {
+    const endDate = new Date();
+    const testObj1 = await this.initShipObj('taipei', 'Seattle', endDate);
+    const testObj2 = await this.initShipObj('tokyo', 'los angeles', endDate);
+    const testObj3 = await this.initShipObj('quito', 'panama', endDate);
 
+    this.shipArr.push(testObj1);
+    this.shipArr.push(testObj2);
+    this.shipArr.push(testObj3);
+  }
   async initShipObj(startLoc, endLoc, endDate) {
     const startCoord = await this.coord(startLoc);
     const endCoord = await this.coord(endLoc);
-    const data = {
-      from: {
-        coordinates: startCoord
-      },
-      to: {
-        coordinates: endCoord
-      }
-    }
 
     return {
       startLoc: startLoc,
@@ -77,7 +74,7 @@ export class AppComponent implements OnInit {
       srcId: uuidv4(),
       ptId: uuidv4(),
       lineId: uuidv4()
-    }
+    };
   }
 
   updateAppTime() {
@@ -108,7 +105,7 @@ export class AppComponent implements OnInit {
 
 
   showGraphics(endDate: Date) {
-    const startDate = new Date(endDate.getTime() - this.daysToShow * 7 * 24 * 3600 * 1000);
+    const startDate = new Date(endDate.getTime() - this.daysToShow * 24 * 3600 * 1000);
     return endDate > this.appTime && startDate < this.appTime;
   }
 
@@ -130,14 +127,27 @@ export class AppComponent implements OnInit {
   }
 
   shipCoord(startCoord, endCoord, endDate: Date) {
-    const deltaX = startCoord[0] - endCoord[0];
-    const deltaY = startCoord[1] - endCoord[1];
+    const D = this.shipSpeed * this.daysToShow * 24; // km total over days to show
+
+    const totalDeltaLon = startCoord[0] - endCoord[0];
+    const totalDeltaLat = startCoord[1] - endCoord[1];
+
+    const AoA = Math.atan2(totalDeltaLat, totalDeltaLon);// "angle of attack"- ratio of lat:lon
+    const lonKm = D * Math.cos(AoA); // KM in the east/west direction
+    const latKm = D * Math.sin(AoA); // KM in north/south
+
+    const latConst = 111.2;
+    const lonConst = 111.2 * Math.cos(Math.PI / 180 * endCoord[1]);
+
+    const deltaLat = latKm / latConst;
+    const deltaLon = lonKm / lonConst;
 
     const daysLeft = (endDate.getTime() - this.appTime.getTime()) / (24 * 3600 * 1000);
     const pct = daysLeft / this.daysToShow;
 
-    //return [(1-endCoord[0] + deltaX * pct, endCoord[1] + deltaY * pct];
-    return [((1 - pct) * startCoord[0]) + endCoord[0] * pct, (1 - pct) * startCoord[1] + endCoord[1] * pct]
+
+    const lonSign = endCoord[0] > this.defaultCenter[0] ? -1 : 1;
+    return [endCoord[0] - lonSign * deltaLon * pct, endCoord[1] + deltaLat * pct];
   }
 
   pointSource(startCoord, endCoord, endDate) {
