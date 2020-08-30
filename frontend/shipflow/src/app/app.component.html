@@ -5,36 +5,33 @@
 
 
 <mgl-map class="mapbox-container" [style]="'mapbox://styles/mapbox/streets-v9'" [zoom]="[2]" [center]=defaultCenter>
-  <!-- <mgl-control mglGeocoder [searchInput]="'Washington, DC'"></mgl-control> -->
-  <mgl-geojson-source id="updater" [data]="testPoint"> </mgl-geojson-source>
-  <mgl-layer id="point" type="circle" [source]="'updater'" [paint]="{
-    'circle-radius': 10,
-    'circle-color': '#007cbf'
-  }"> </mgl-layer>
+
+  <ng-container *ngFor="let obj of shipArr">
+    <!-- <mgl-geojson-source id="updater" [data]="testPoint"> </mgl-geojson-source>
+    <mgl-layer id="point" type="circle" [source]="'updater'" [paint]="{
+      'circle-radius': 10,
+      'circle-color': '#007cbf'
+    }"> </mgl-layer> -->
+
+    <mgl-layer id="point" type="circle" [source]="pointSource(obj.startCoord, obj.endCoord, obj.endDate)" [paint]="{
+      'circle-radius': 10,
+      'circle-color': '#007cbf'
+    }"> </mgl-layer>
 
 
 
-  <mgl-layer id="route" type="line" [source]="{
-    type: 'geojson',
-    data: {
-      type: 'Feature',
-      properties: {},
-      geometry: {
-        type: 'LineString',
-        coordinates: [
-          [-77.0366, 38.895],
-          [0, 51.5]
-        ]
-      }
-    }
-  }" [layout]="{
-    'line-join': 'round',
-    'line-cap': 'round'
-  }" [paint]="{
-    'line-color': '#888',
-    'line-width': 8
-  }">
-  </mgl-layer>
+
+    <mgl-layer id="route" type="line" [source]="lineSource(obj.startCoord, obj.endCoord)" [layout]="{
+      'line-join': 'round',
+      'line-cap': 'round'
+    }" [paint]="{
+      'line-color': '#888',
+      'line-width': 8
+    }">
+    </mgl-layer>
+
+  </ng-container>
+
 
 
 

@@ -18,11 +18,11 @@ export class AppComponent implements OnInit {
   timeRate = 2;// clock seconds per app day
   updateRate = 100;// rerenders per second
   shipSpeed = 37; // 37 kph is approx 20 knots 
+  daysToShow = 7; // number of days to show a ship for
 
-
-  masterArr: {
+  shipArr: {
     startLoc: string
-    endLock: string
+    endLoc: string
     startCoord: number[]
     endCoord: number[]
     endDate: Date
@@ -34,22 +34,34 @@ export class AppComponent implements OnInit {
 
   }
 
-  ngOnInit() {
+  async ngOnInit() {
 
+    // start app clock
     setInterval(() => { this.updateAppTime() }, 1000 / this.updateRate)
 
-
-
-    const startLocation = 'New York';
-    const endLocation = 'London';
+    const startLoc = 'New York';
+    const endLoc = 'Berlin';
     const endDate = new Date();
+    const testObj = await this.initShipObj(startLoc, endLoc, endDate);
 
+    this.shipArr.push(testObj);
+  }
+
+  async initShipObj(startLoc, endLoc, endDate) {
+    const startCoord = await this.coord(startLoc);
+    const endCoord = await this.coord(endLoc);
+    return {
+      startLoc: startLoc,
+      endLoc: endLoc,
+      startCoord: startCoord,
+      endCoord: endCoord,
+      endDate: endDate
+    }
   }
 
   updateAppTime() {
     const curTime = this.appTime.getTime();
     const newTime = curTime + 24 * 3600 * 1000 / this.updateRate / this.timeRate;
-    console.log(this.appTime);
     this.appTime = new Date(newTime);
   }
 
@@ -68,7 +80,8 @@ export class AppComponent implements OnInit {
   }
 
 
-
+  // Hit Mapbox geo code API to figure out
+  // lat/lon from a generic place name
   async coord(placeName: string) {
     let request = "https://api.mapbox.com/geocoding/v5/mapbox.places/";
     request += placeName
@@ -82,10 +95,48 @@ export class AppComponent implements OnInit {
 
     const bestfeature = features[0];
     return bestfeature['center'];
-
-
   }
 
 
 
+
+  showGraphics(endDate: Date) {
+    const startDate = new Date(endDate.getTime() - this.daysToShow * 7 * 24 * 3600 * 1000);
+    return endDate > this.appTime && startDate < this.appTime;
+  }
+
+  lineSource(startCoord, endCoord) {
+    return {
+      type: 'geojson',
+      data: {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            startCoord,
+            endCoord
+          ]
+        }
+      }
+    };
+  }
+  shipCoord(startCoord, endCoord, endDate) {
+
+  }
+  pointSource(startCoord, endCoord, endDate) {
+    //TODO call shipCoord here
+
+    const ret = {
+      type: 'geojson',
+      data: {
+        type: 'Point',
+        coordinates: startCoord
+      }
+    };
+    console.log(ret);
+    return ret;
+  }
 }
+
+
