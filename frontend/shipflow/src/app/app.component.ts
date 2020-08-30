@@ -14,9 +14,9 @@ export class AppComponent implements OnInit {
   //londonishCenter = [0, 51.5];
 
   private timer: number;
-  appTime = new Date('2020-08-29');
+  appTime = new Date('2020-08-25');
   timeRate = 2;// clock seconds per app day
-  updateRate = 100;// rerenders per second
+  updateRate = 10;// rerenders per second
   shipSpeed = 37; // 37 kph is approx 20 knots 
   daysToShow = 7; // number of days to show a ship for
 
@@ -121,20 +121,29 @@ export class AppComponent implements OnInit {
       }
     };
   }
-  shipCoord(startCoord, endCoord, endDate) {
 
+  shipCoord(startCoord, endCoord, endDate: Date) {
+    const deltaX = startCoord[0] - endCoord[0];
+    const deltaY = startCoord[1] - endCoord[1];
+
+    const daysLeft = (endDate.getTime() - this.appTime.getTime()) / (24 * 3600 * 1000);
+    const pct = daysLeft / this.daysToShow;
+
+    return [endCoord[0] + deltaX * pct, endCoord[1] + deltaY * pct];
   }
+
   pointSource(startCoord, endCoord, endDate) {
     //TODO call shipCoord here
-
+    const curCoord = this.shipCoord(startCoord, endCoord, endDate);
+    console.log(curCoord);
     const ret = {
       type: 'geojson',
       data: {
         type: 'Point',
-        coordinates: startCoord
+        coordinates: curCoord
       }
     };
-    console.log(ret);
+
     return ret;
   }
 }
