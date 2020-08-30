@@ -8,7 +8,8 @@
 
   <ng-container *ngFor="let obj of shipArr">
 
-    <mgl-layer id="point" type="circle" [source]="pointSource(obj.startCoord, obj.endCoord, obj.endDate)" [paint]="{
+    <mgl-geojson-source [id]="obj.srcId" [data]="obj.curSource"> </mgl-geojson-source>
+    <mgl-layer [id]="obj.ptId" type="circle" [source]="obj.srcId" [paint]="{
       'circle-radius': 10,
       'circle-color': '#007cbf'
     }"> </mgl-layer>

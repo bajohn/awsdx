@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { v4 as uuidv4 } from 'uuid';
 
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 
@@ -13,10 +14,9 @@ export class AppComponent implements OnInit {
   defaultCenter = [-77.0366, 38.895]; //[-98.585522, 39.8333333];
   //londonishCenter = [0, 51.5];
 
-  private timer: number;
   appTime = new Date('2020-08-25');
   timeRate = 2;// clock seconds per app day
-  updateRate = 10;// rerenders per second
+  updateRate = 100;// rerenders per second
   shipSpeed = 37; // 37 kph is approx 20 knots 
   daysToShow = 7; // number of days to show a ship for
 
@@ -26,6 +26,7 @@ export class AppComponent implements OnInit {
     startCoord: number[]
     endCoord: number[]
     endDate: Date
+    curSource: any
   }[] = [];
 
 
@@ -43,7 +44,6 @@ export class AppComponent implements OnInit {
     const endLoc = 'Berlin';
     const endDate = new Date();
     const testObj = await this.initShipObj(startLoc, endLoc, endDate);
-
     this.shipArr.push(testObj);
   }
 
@@ -55,7 +55,10 @@ export class AppComponent implements OnInit {
       endLoc: endLoc,
       startCoord: startCoord,
       endCoord: endCoord,
-      endDate: endDate
+      endDate: endDate,
+      curSource: this.pointSource(startCoord, endCoord, endDate),
+      srcId: uuidv4(),
+      ptId: uuidv4()
     }
   }
 
@@ -63,6 +66,7 @@ export class AppComponent implements OnInit {
     const curTime = this.appTime.getTime();
     const newTime = curTime + 24 * 3600 * 1000 / this.updateRate / this.timeRate;
     this.appTime = new Date(newTime);
+    this.updateShips();
   }
 
   async doRequest() {
@@ -133,18 +137,21 @@ export class AppComponent implements OnInit {
   }
 
   pointSource(startCoord, endCoord, endDate) {
-    //TODO call shipCoord here
-    const curCoord = this.shipCoord(startCoord, endCoord, endDate);
-    console.log(curCoord);
-    const ret = {
-      type: 'geojson',
-      data: {
-        type: 'Point',
-        coordinates: curCoord
-      }
-    };
 
+    const curCoord = this.shipCoord(startCoord, endCoord, endDate);
+    const ret = {
+      type: 'Point',
+      coordinates: curCoord
+    }
     return ret;
+  }
+
+  updateShips() {
+    for (let i in this.shipArr) {
+      const curObj = this.shipArr[i]
+      const ret = { ...curObj };
+      this.shipArr[i].curSource = this.pointSource(ret.startCoord, ret.endCoord, ret.endDate);
+    }
   }
 }
 
