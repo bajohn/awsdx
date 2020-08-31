@@ -51,7 +51,7 @@ export class AppComponent implements OnInit {
     setInterval(() => { this.updateAppTime() }, 1000 / this.updateRate)
 
     // 
-    this.debugArray();
+    this.debugFetchArray();
 
   }
 
@@ -65,6 +65,12 @@ export class AppComponent implements OnInit {
     this.shipArr.push(testObj2);
     this.shipArr.push(testObj3);
   }
+
+  async debugFetchArray() {
+    const resp = await fetch('https://cq2lqs0ov8.execute-api.us-east-1.amazonaws.com/prod/2020-07-01');
+    console.log(resp);
+  }
+
   async initShipObj(startLoc, endLoc, endDate, vesselName, weight) {
     const startCoord = await this.coord(startLoc);
     const endCoord = await this.coord(endLoc);
