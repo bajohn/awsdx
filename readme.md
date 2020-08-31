@@ -56,8 +56,51 @@ Front end:
 Sample Header row
 
 
-1
+`identifier,carrier_code,vessel_country_code,vessel_name,port_of_unlading,estimated_arrival_date,foreign_port_of_lading_qualifier,foreign_port_of_lading,manifest_quantity,manifest_unit,weight,weight_unit,measurement,measurement_unit,record_status_indicator,place_of_receipt,port_of_destination,foreign_port_of_destination_qualifier,foreign_port_of_destination,conveyance_id_qualifier,conveyance_id,in_bond_entry_type,mode_of_transportation,secondary_notify_party_1,secondary_notify_party_2,secondary_notify_party_3,secondary_notify_party_4,secondary_notify_party_5,secondary_notify_party_6,secondary_notify_party_7,secondary_notify_party_8,secondary_notify_party_9,secondary_notify_party_10,actual_arrival_date`
 
+### Database
+
+Table location: `awsdx_db.cbp_headers` 
+
+Row count: 12460741
+
+DB Schema
+
+```identifier int,
+carrier_code string,
+vessel_country_code string,
+vessel_name string,
+port_of_unlading string,
+estimated_arrival_date date,
+foreign_port_of_lading_qualifier string,
+foreign_port_of_lading string,
+manifest_quantity int,
+manifest_unit string,
+weight int,
+weight_unit string,
+measurement int,
+measurement_unit string,
+record_status_indicator string,
+place_of_receipt string,
+port_of_destination string,
+foreign_port_of_destination_qualifier string,
+foreign_port_of_destination string,
+conveyance_id_qualifier string,
+conveyance_id int,
+in_bond_entry_type string,
+mode_of_transportation string,
+secondary_notify_party_1 string,
+secondary_notify_party_2 string,
+secondary_notify_party_3 string,
+secondary_notify_party_4 string,
+secondary_notify_party_5 string,
+secondary_notify_party_6 string,
+secondary_notify_party_7 string,
+secondary_notify_party_8 string,
+secondary_notify_party_9 string,
+secondary_notify_party_10 string,
+actual_arrival_date date
+```
 
 
 ## Dead Ideas
