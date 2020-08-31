@@ -21,6 +21,8 @@ resource "aws_lambda_function" "data_agg_lambda" {
   timeout = 10 # timeout in seconds. Is typically below 2 seconds, average around 600ms.
 }
 
+
+
 resource "aws_iam_role" "iam_for_lambda_default" {
   name = "iam_for_lambda_default"
 
@@ -41,10 +43,22 @@ resource "aws_iam_role" "iam_for_lambda_default" {
 EOF
 }
 
-resource "aws_iam_policy_attachment" "iam_for_lambda_default_attach" {
-  name       = "IAM for lambda default policy attachment"
+resource "aws_iam_policy_attachment" "iam_for_lambda_data_exchange_attach" {
+  name       = "AWSDX Data Exchange Policy"
   roles      = [aws_iam_role.iam_for_lambda_default.name]
   policy_arn = "arn:aws:iam::aws:policy/AWSDataExchangeFullAccess"
+}
+
+resource "aws_iam_policy_attachment" "iam_for_lambda_athena_attach" {
+  name       = "Athena Exchange Policy"
+  roles      = [aws_iam_role.iam_for_lambda_default.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonAthenaFullAccess"
+}
+
+resource "aws_iam_policy_attachment" "iam_for_lambda_s3_attach" {
+  name       = "S3 Exchange Policy"
+  roles      = [aws_iam_role.iam_for_lambda_default.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 

@@ -1,15 +1,8 @@
-
-
-# RIP
-
-Didn't end up submitting, life got in the way!
-
-
 # AWS Data Exchange Hackathon 
 Repo for hackathon described here:
 https://awsdataexchange.devpost.com/
 
-Deadline: 5:00pm EDT Aug 24, 2020
+Deadline: 5:00pm EDT Sep 1, 2020
 
 ## Deployment 
 `./scripts/deploy.sh --libs=true`
@@ -66,7 +59,8 @@ Row count: 12460741
 
 DB Schema
 
-```identifier int,
+```
+identifier int,
 carrier_code string,
 vessel_country_code string,
 vessel_name string,
