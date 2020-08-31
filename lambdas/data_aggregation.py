@@ -1,23 +1,19 @@
 import boto3
 import logging
 import time
+import json
+import logging
 
 
 def handler(event, context):
-    client = boto3.client('athena')
-    print('starting...')
-    response = client.start_query_execution(
-        QueryString=__query('2020-07-19'),
-        QueryExecutionContext={
-            'Database': 'awsdx_db',
-            'Catalog': 'AwsDataCatalog'
-        },
-        WorkGroup='primary',
-        ResultConfiguration={
-            'OutputLocation': 's3://awsdx-data-bucket/query_results/'
-        }
+    logger = logging.getLogger('ShipFlow')
+    logger.setLevel(logging.INFO)
+    # Expected path format: /2020-07-19
+    date = event['path'].replace('/', '')
 
-    )
+    client = boto3.client('athena')
+    logger.info('starting...')
+    response = __queryRequest(client, date)
 
     print('Query sent')
     print(response)
@@ -42,7 +38,7 @@ def handler(event, context):
 
     resp = __parseRows(rows)
     print(resp)
-    return resp
+    return __formatResponse(resp)
 
 
 def __parseRows(rows):
@@ -55,12 +51,27 @@ def __parseRows(rows):
         for i in range(len(headerData)):
             if 'VarCharValue' in curData[i]:
                 curRet[headerData[i]['VarCharValue']
-                       ] = curData[i]['VarCharValue']
+                       ] = curData[i]['VarCharValue'].replace('"', '')
         ret.append(curRet)
     return ret
 
 
+def __queryRequest(client, date):
+    return client.start_query_execution(
+        QueryString=__query(date),
+        QueryExecutionContext={
+            'Database': 'awsdx_db',
+            'Catalog': 'AwsDataCatalog'
+        },
+        WorkGroup='primary',
+        ResultConfiguration={
+            'OutputLocation': 's3://awsdx-data-bucket/query_results/'
+        }
+    )
+
 # date format 2020-07-19
+
+
 def __query(date):
     return f"""
     SELECT vessel_name,
@@ -70,8 +81,16 @@ def __query(date):
         weight_unit,
         conveyance_id,
         sum(weight) as total_weight
-    FROM awsdx_db.cbp_headers_tsv 
+    FROM awsdx_db.cbp_headers_tsv
     where actual_arrival_date = DATE('{date}')
     group by 1,2,3,4,5,6
-    limit 2
     """
+
+
+def __formatResponse(resp):
+    return {
+        'isBase64Encoded': False,
+        'statusCode': 200,
+        'headers': {},
+        'body': json.dumps(resp)
+    }

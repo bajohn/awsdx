@@ -18,7 +18,8 @@ resource "aws_lambda_function" "data_agg_lambda" {
   layers  = [aws_lambda_layer_version.lib_layer.arn]
   runtime = "python3.8"
   source_code_hash = filebase64sha256("../out/data_aggregation.zip")
-  timeout = 10 # timeout in seconds. Is typically below 2 seconds, average around 600ms.
+  timeout = 20 # timeout in seconds. 
+  memory_size = 256
 }
 
 
