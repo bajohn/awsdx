@@ -4,6 +4,21 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { Map } from 'mapbox-gl';
 
+interface ship {
+  startLoc: string
+  endLoc: string
+  startCoord: number[]
+  endCoord: number[]
+  endDate: Date
+  vesselName: string
+  weight: number
+
+  sourceData: any
+  srcId: string
+  ptId: string
+  lineId: string
+  showPopup: boolean
+}
 
 @Component({
   selector: 'app-root',
@@ -23,17 +38,7 @@ export class AppComponent implements OnInit {
 
   map: Map;
 
-  shipArr: {
-    startLoc: string
-    endLoc: string
-    startCoord: number[]
-    endCoord: number[]
-    endDate: Date
-    sourceData: any
-    srcId: string
-    ptId: string
-    lineId: string
-  }[] = [];
+  shipArr: ship[] = [];
 
 
   constructor() {
@@ -52,15 +57,15 @@ export class AppComponent implements OnInit {
 
   async debugArray() {
     const endDate = new Date();
-    const testObj1 = await this.initShipObj('taipei', 'Seattle', endDate);
-    const testObj2 = await this.initShipObj('tokyo', 'los angeles', endDate);
-    const testObj3 = await this.initShipObj('quito', 'panama', endDate);
+    const testObj1 = await this.initShipObj('taipei', 'Seattle', endDate, 'boaty mcmboatface', 724);
+    const testObj2 = await this.initShipObj('tokyo', 'los angeles', endDate, 'SWLV', 40923);
+    const testObj3 = await this.initShipObj('Nhava Sheva,India', 'New York Newark Area, Newark, New Jersey', endDate, 'MAERSK', 82505923042);
 
     this.shipArr.push(testObj1);
     this.shipArr.push(testObj2);
     this.shipArr.push(testObj3);
   }
-  async initShipObj(startLoc, endLoc, endDate) {
+  async initShipObj(startLoc, endLoc, endDate, vesselName, weight) {
     const startCoord = await this.coord(startLoc);
     const endCoord = await this.coord(endLoc);
 
@@ -70,10 +75,14 @@ export class AppComponent implements OnInit {
       startCoord: startCoord,
       endCoord: endCoord,
       endDate: endDate,
+      vesselName: vesselName,
+      weight: weight,
+
       sourceData: this.pointSource(startCoord, endCoord, endDate),
       srcId: uuidv4(),
       ptId: uuidv4(),
-      lineId: uuidv4()
+      lineId: uuidv4(),
+      showPopup: false
     };
   }
 
@@ -171,6 +180,15 @@ export class AppComponent implements OnInit {
   // Not yet used but could be useful.
   saveMap(map: Map) {
     this.map = map;
+  }
+
+  circleEnter(shipIdx: number) {
+    console.log(shipIdx);
+    this.shipArr[shipIdx].showPopup = true;
+  }
+  circleExit(shipIdx: number) {
+    console.log(shipIdx);
+    this.shipArr[shipIdx].showPopup = false;
   }
 
 }
