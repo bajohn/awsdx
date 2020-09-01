@@ -14,8 +14,8 @@
       <mgl-geojson-source [id]="obj.srcId" [data]="obj.sourceData"> </mgl-geojson-source>
       <mgl-layer (mouseEnter)="circleEnter(i)" (mouseLeave)="circleExit(i)" [id]="obj.ptId" type="circle"
         [source]="obj.srcId" [paint]="{
-        'circle-radius': 10,
-        'circle-color': '#007cbf'
+        'circle-radius': 3,
+        'circle-color': 'red'
       }"> </mgl-layer>
       <mgl-popup [lngLat]="obj.sourceData.coordinates" [closeOnClick]="true" *ngIf="obj.showPopup">
         <div>
@@ -26,6 +26,16 @@
           Weight:
           {{ obj.weight  }} kg
         </div>
+        <div>
+          Origin:
+          {{ obj.startLoc  }} kg
+        </div>
+
+        <div>
+          Destination:
+          {{ obj.endLoc  }} kg
+        </div>
+
 
 
       </mgl-popup>

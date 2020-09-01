@@ -30,10 +30,10 @@ export class AppComponent implements OnInit {
   testPoint: GeoJSON.Point = { type: 'Point', coordinates: [0, 0] };
   defaultCenter = [-98.585522, 39.8333333]; //[-77.0366, 38.895]; // Assumes Kansas!
 
-  appTime = new Date('2020-08-29');
-  timeRate = 10;// clock seconds per app day
+  appTime = new Date('2020-6-30');
+  timeRate = 50;// clock seconds per app day
   updateRate = 10;// rerenders per second
-  shipSpeed = 37; // 37 kph is approx 20 knots 
+  shipSpeed = 18; // 37 kph is approx 20 knots 
   daysToShow = 2; // number of days to show a ship for
 
   map: Map;
@@ -68,28 +68,43 @@ export class AppComponent implements OnInit {
 
   async debugFetchArray() {
     const resp = await fetch('https://cq2lqs0ov8.execute-api.us-east-1.amazonaws.com/prod/2020-07-01');
-    console.log(resp);
+    const respJson = await resp.json();
+    const promiseArr = [];
+    for (const key of Object.keys(respJson)) {
+      const curObj = respJson[key];
+
+      promiseArr.push(this.initShipObj(curObj['foreign_port_of_lading'], curObj['port_of_unlading'], new Date(curObj['actual_arrival_date']), key, curObj['total_weight']));
+    }
+    const ships = await Promise.all(promiseArr);
+
+    for (const ship of ships) {
+      if (ship !== undefined) {
+        this.shipArr.push(ship);
+      }
+    }
   }
 
   async initShipObj(startLoc, endLoc, endDate, vesselName, weight) {
     const startCoord = await this.coord(startLoc);
     const endCoord = await this.coord(endLoc);
+    if (startCoord.length === 2 && endCoord.length === 2) {
+      return {
+        startLoc: startLoc,
+        endLoc: endLoc,
+        startCoord: startCoord,
+        endCoord: endCoord,
+        endDate: endDate,
+        vesselName: vesselName,
+        weight: weight,
 
-    return {
-      startLoc: startLoc,
-      endLoc: endLoc,
-      startCoord: startCoord,
-      endCoord: endCoord,
-      endDate: endDate,
-      vesselName: vesselName,
-      weight: weight,
+        sourceData: this.pointSource(startCoord, endCoord, endDate),
+        srcId: uuidv4(),
+        ptId: uuidv4(),
+        lineId: uuidv4(),
+        showPopup: false
+      };
+    }
 
-      sourceData: this.pointSource(startCoord, endCoord, endDate),
-      srcId: uuidv4(),
-      ptId: uuidv4(),
-      lineId: uuidv4(),
-      showPopup: false
-    };
   }
 
   updateAppTime() {
@@ -110,11 +125,14 @@ export class AppComponent implements OnInit {
     request += this.accessToken;
 
     const resp = await fetch(request);
-    const respBody = await resp.json();
-    const features = respBody['features'];
+    if (resp.status === 200) {
+      const respBody = await resp.json();
+      const features = respBody['features'];
 
-    const bestfeature = features[0];
-    return bestfeature['center'];
+      const bestfeature = features[0];
+      return bestfeature['center'];
+    }
+    return [];
   }
 
 
