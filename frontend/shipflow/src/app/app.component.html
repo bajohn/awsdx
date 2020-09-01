@@ -20,7 +20,7 @@
       </mat-grid-tile>
 
       <mat-grid-tile [colspan]="2" [rowspan]="1">
-        <mat-slider  (mousedown)="mouseDown()" (change)="sliderChange($event)" [(ngModel)]="slider"></mat-slider>
+        <mat-slider (mousedown)="mouseDown()" (change)="sliderChange($event)" [(ngModel)]="slider"></mat-slider>
         <!-- <mat-spinner></mat-spinner> -->
       </mat-grid-tile>
 
@@ -61,6 +61,11 @@
           <div>
             Destination:
             {{ obj.endLoc  }}
+          </div>
+
+          <div>
+            Arrival Date:
+            {{ obj.endDate.toUTCString()  }}
           </div>
 
 
