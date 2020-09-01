@@ -4,5 +4,18 @@
     width: 100%;
     height: 1000px;
 }
+
+.top-bar {
+    background-color: #10161d
+}
+
+.icon-style {
+    color: #f44336
+}
+
+.logo {
+    font-size: 30px;
+    color: #f44336;
+}
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

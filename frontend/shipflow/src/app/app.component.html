@@ -1,11 +1,30 @@
-<div>
-  Hello world
-  {{appTime}}
+<div class="top-bar">
+  <mat-grid-list cols="8" rowHeight="40px">
+
+    <mat-grid-tile [colspan]="3" [rowspan]="1" (click)="pauseClick()">
+      <fa-icon [icon]="faShip" size="2x" class="icon-style"></fa-icon>
+      <div class="logo">
+        ShipFlow
+      </div>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="1" [rowspan]="1">
+
+      <fa-icon [icon]="faPause" size="2x" class="icon-style"></fa-icon>
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="1" [rowspan]="1">
+      {{appTime}}
+    </mat-grid-tile>
+
+    <mat-grid-tile [colspan]="1" [rowspan]="1">
+      <mat-spinner></mat-spinner>
+    </mat-grid-tile>
+
+  </mat-grid-list>
 </div>
 
-<div (click)="pauseClick()">
-  Pause
-</div>
+
 <mgl-map (load)="saveMap($event)" class="mapbox-container" [style]="'mapbox://styles/mapbox/streets-v9'" [zoom]="[2]"
   [center]=defaultCenter>
 
@@ -34,12 +53,12 @@
         </div>
         <div>
           Origin:
-          {{ obj.startLoc  }} 
+          {{ obj.startLoc  }}
         </div>
 
         <div>
           Destination:
-          {{ obj.endLoc  }} 
+          {{ obj.endLoc  }}
         </div>
 
 

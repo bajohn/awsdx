@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Map } from 'mapbox-gl';
+import { faCoffee, faPause, faShip} from '@fortawesome/free-solid-svg-icons';
 
 interface ship {
   startLoc: string
@@ -43,6 +44,8 @@ export class AppComponent implements OnInit {
 
   shipArr: ship[] = [];
 
+  faPause = faPause;
+  faShip = faShip
 
   constructor() {
 
@@ -54,7 +57,7 @@ export class AppComponent implements OnInit {
     setInterval(() => { this.updateAppTime() }, 1000 / this.updateRate)
 
     // 
-    this.debugFetchArray();
+    //this.debugFetchArray();
 
   }
 
@@ -106,7 +109,7 @@ export class AppComponent implements OnInit {
         endCoord: endCoord,
         endDate: endDate,
         vesselName: vesselName,
-        weight: weight,
+        weight: Math.round(weight),
         imoNumber: imoNumber,
 
         sourceData: this.pointSource(endCoord, endDate, lonOffset, latOffset),
