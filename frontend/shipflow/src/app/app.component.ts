@@ -31,8 +31,8 @@ export class AppComponent implements OnInit {
   defaultCenter = [-98.585522, 39.8333333]; //[-77.0366, 38.895]; // Assumes Kansas!
 
   appTime = new Date('2020-6-30');
-  timeRate = 50;// clock seconds per app day
-  updateRate = 10;// rerenders per second
+  timeRate = 10;// clock seconds per app day
+  updateRate = 20;// rerenders per second
   shipSpeed = 18; // 37 kph is approx 20 knots 
   daysToShow = 2; // number of days to show a ship for
 
@@ -162,15 +162,15 @@ export class AppComponent implements OnInit {
   shipCoord(startCoord, endCoord, endDate: Date) {
     const D = this.shipSpeed * this.daysToShow * 24; // km total over days to show
 
-    const totalDeltaLon = startCoord[0] - endCoord[0];
-    const totalDeltaLat = startCoord[1] - endCoord[1];
+    const totalDeltaLon = endCoord[0] - this.defaultCenter[0];
+    const totalDeltaLat = endCoord[1] - this.defaultCenter[1];
 
     const AoA = Math.atan2(totalDeltaLat, totalDeltaLon);// "angle of attack"- ratio of lat:lon
     const lonKm = D * Math.cos(AoA); // KM in the east/west direction
     const latKm = D * Math.sin(AoA); // KM in north/south
 
     const latConst = 111.2;
-    const lonConst = 111.2 * Math.cos(Math.PI / 180 * endCoord[1]);
+    const lonConst = 111.2 * Math.cos(Math.PI / 180 * this.defaultCenter[1]);
 
     const deltaLat = latKm / latConst;
     const deltaLon = lonKm / lonConst;
@@ -179,8 +179,9 @@ export class AppComponent implements OnInit {
     const pct = daysLeft / this.daysToShow;
 
 
-    const lonSign = endCoord[0] > this.defaultCenter[0] ? -1 : 1;
-    return [endCoord[0] - lonSign * deltaLon * pct, endCoord[1] + deltaLat * pct];
+    //const lonSign = endCoord[0] > this.defaultCenter[0] ? -1 : 1;
+    //lonSign * deltaLon * pct,
+    return [endCoord[0] + deltaLon * pct, endCoord[1] + deltaLat * pct];
   }
 
   pointSource(startCoord, endCoord, endDate) {
