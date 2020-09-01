@@ -33,13 +33,13 @@ export class AppComponent implements OnInit {
 
   // Main map params
   defaultCenter = [-98.585522, 39.8333333]; //[-77.0366, 38.895]; // Assumes Kansas!
-  appTime = new Date('2020-1-3');
+  appTime = new Date('2020-1-1');
   minDate = new Date('2020-1-1');
   maxDate = new Date('2020-08-23');
   timeRate = 20;// clock seconds per app day
-  updateRate = 1;// rerenders per second
+  updateRate = 5;// rerenders per second
   shipSpeed = 18; // 37 kph is approx 20 knots 
-  daysToShow = 2; // number of days to show a ship for
+  daysToShow = 3; // number of days to show a ship for
   paused = false;
 
 
@@ -62,8 +62,8 @@ export class AppComponent implements OnInit {
     setInterval(() => { this.updateAppTime() }, 1000 / this.updateRate)
 
     // 
-
-    this.doPull(this.appTime, this.daysToShow);
+    const pullTime = new Date(this.appTime.getTime() - this.daysToShow * 24 * 3600 * 1000)
+    this.doPull(pullTime, this.daysToShow);
 
   }
 
@@ -94,7 +94,8 @@ export class AppComponent implements OnInit {
 
     const dateToFetch = new Date(dateToPull.getTime() + this.daysToShow * 24 * 3600 * 1000);
     const dateStrToFetch = `${dateToFetch.getFullYear()}-${dateToFetch.getMonth() + 1}-${dateToFetch.getUTCDate()}`;
-    console.log(dateStrToFetch);
+    console.log('Pulling', dateStrToFetch);
+
     const resp = await fetch(`https://cq2lqs0ov8.execute-api.us-east-1.amazonaws.com/prod/${dateStrToFetch}`);
     const respJson = await resp.json();
     const promiseArr = [];
@@ -159,18 +160,15 @@ export class AppComponent implements OnInit {
       const newTimeObj = new Date(newTimeMs);
       const newTimeDate = newTimeObj.getUTCDate()
 
-      const bufferDayMs = curTime + (this.daysToShow) * 24 * 3600 * 1000
-      const bufferTimeObj = new Date(bufferDayMs);
-
       if (this.maxDate > newTimeObj) {
         if (this.slideClickState === 0) {
           this.slider = 100 * (newTimeMs - this.minDate.getTime()) / (this.maxDate.getTime() - this.minDate.getTime())
         }
-
-        this.appTime = newTimeObj
         if (newTimeDate !== curDate) {
-          this.doPull(bufferTimeObj, 1);
+          this.doPull(this.appTime, 1);
         }
+        this.appTime = newTimeObj
+
         this.updateShips();
       }
 
@@ -287,10 +285,21 @@ export class AppComponent implements OnInit {
       this.appTime = new Date(this.minDate.getTime() + totalMs * this.slider / 100)
       this.slideClickState = 0;
       this.shipArr = [];
-      this.doPull(this.appTime, this.daysToShow);
+      const pullTime = new Date(this.appTime.getTime() - this.daysToShow * 24 * 3600 * 1000);
+      this.doPull(pullTime, this.daysToShow);
     }
 
 
+  }
+
+  getPaint(obj) {
+    
+    const radius = Math.max(Math.log(obj.weight)/2,1);
+
+    return {
+      'circle-radius': radius,
+      'circle-color': 'red'
+    }
   }
 
 
