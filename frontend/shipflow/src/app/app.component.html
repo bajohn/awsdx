@@ -21,14 +21,33 @@
 
       <mat-grid-tile [colspan]="2" [rowspan]="1">
         <mat-slider (mousedown)="mouseDown()" (change)="sliderChange($event)" [(ngModel)]="slider"></mat-slider>
-        <!-- <mat-spinner></mat-spinner> -->
+
+
       </mat-grid-tile>
+
+      <mat-grid-tile [colspan]="1" [rowspan]="1" class="clickable">
+        <fa-icon (click)="aboutClick()" [icon]="faQuestion" size="2x" class="icon-style"></fa-icon>
+      </mat-grid-tile>
+
 
     </mat-grid-list>
   </div>
 
 
-  <mgl-map class="mapbox-container" [style]="'mapbox://styles/mapbox/streets-v9'" [zoom]="[2]" [center]=defaultCenter>
+  <div *ngIf="showAbout" class="about">
+    <h1>
+      ShipFlow
+    </h1>
+    <div>
+      This app was made for the <a href="https://awsdataexchange.devpost.com/">AWS Data Exchange Challenge. </a>
+    </div>
+    <div>
+       <a target="__blank" href=" https://tuvo.io/contact"> Contact</a>
+    </div>
+  </div>
+
+  <mgl-map class="mapbox-container" [style]="'mapbox://styles/mapbox/streets-v9'" [zoom]="[2]" [center]=defaultCenter
+    *ngIf="!showAbout">
 
     <ng-container *ngFor="let obj of shipArr; index as i;">
 

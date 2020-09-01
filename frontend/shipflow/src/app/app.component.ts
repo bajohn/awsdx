@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Map } from 'mapbox-gl';
-import { faCoffee, faPause, faShip, faPlay } from '@fortawesome/free-solid-svg-icons';
+import {  faPause, faShip, faPlay, faQuestion} from '@fortawesome/free-solid-svg-icons';
 
 interface ship {
   startLoc: string
@@ -41,7 +41,8 @@ export class AppComponent implements OnInit {
   shipSpeed = 18; // 37 kph is approx 20 knots 
   daysToShow = 3; // number of days to show a ship for
   paused = false;
-
+  showAbout = false;
+  
 
 
   shipArr: ship[] = [];
@@ -49,6 +50,7 @@ export class AppComponent implements OnInit {
   faPause = faPause;
   faShip = faShip;
   faPlay = faPlay;
+  faQuestion = faQuestion;
 
   slider = 10;
   slideClickState = 0;
@@ -82,7 +84,7 @@ export class AppComponent implements OnInit {
   doPull(firstDate, daysToPull) {
     let curDate = new Date(firstDate.getTime());
     while (daysToPull > 0) {
-      this.shipsFromApi(curDate);
+      //this.shipsFromApi(curDate);
 
 
       curDate = new Date(curDate.getTime() + 24 * 3600 * 1000);
@@ -300,6 +302,10 @@ export class AppComponent implements OnInit {
       'circle-radius': radius,
       'circle-color': 'red'
     }
+  }
+
+  aboutClick(){
+    this.showAbout = !this.showAbout;
   }
 
 

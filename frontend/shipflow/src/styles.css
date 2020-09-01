@@ -22,6 +22,10 @@
     cursor: pointer;
 }
 
+.about {
+    margin:10px;
+}
+
 
 
 html, body { height: 100%; }

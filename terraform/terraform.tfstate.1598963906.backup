@@ -1,7 +1,7 @@
 {
   "version": 4,
   "terraform_version": "0.12.24",
-  "serial": 142,
+  "serial": 137,
   "lineage": "b061dc99-7596-1224-0fc8-7d12e8217a5f",
   "outputs": {},
   "resources": [
@@ -62,128 +62,6 @@
           "dependencies": [
             "aws_s3_bucket.awsdx_data_bucket"
           ]
-        }
-      ]
-    },
-    {
-      "mode": "managed",
-      "type": "aws_cloudfront_distribution",
-      "name": "website_distribution",
-      "provider": "provider.aws",
-      "instances": [
-        {
-          "schema_version": 1,
-          "attributes": {
-            "active_trusted_signers": {
-              "enabled": "false",
-              "items.#": "0"
-            },
-            "aliases": [
-              "ship-flow.io"
-            ],
-            "arn": "arn:aws:cloudfront::748004005034:distribution/E1EFARXD2O1SGB",
-            "cache_behavior": [],
-            "caller_reference": "terraform-20200901123727472100000002",
-            "comment": null,
-            "custom_error_response": [
-              {
-                "error_caching_min_ttl": 300,
-                "error_code": 403,
-                "response_code": 200,
-                "response_page_path": "/index.html"
-              },
-              {
-                "error_caching_min_ttl": 300,
-                "error_code": 404,
-                "response_code": 200,
-                "response_page_path": "/index.html"
-              }
-            ],
-            "default_cache_behavior": [
-              {
-                "allowed_methods": [
-                  "GET",
-                  "HEAD"
-                ],
-                "cached_methods": [
-                  "GET",
-                  "HEAD"
-                ],
-                "compress": false,
-                "default_ttl": 86400,
-                "field_level_encryption_id": "",
-                "forwarded_values": [
-                  {
-                    "cookies": [
-                      {
-                        "forward": "none",
-                        "whitelisted_names": []
-                      }
-                    ],
-                    "headers": [],
-                    "query_string": false,
-                    "query_string_cache_keys": []
-                  }
-                ],
-                "lambda_function_association": [],
-                "max_ttl": 31536000,
-                "min_ttl": 0,
-                "smooth_streaming": false,
-                "target_origin_id": "ship-flow.io-s3-origin",
-                "trusted_signers": [],
-                "viewer_protocol_policy": "allow-all"
-              }
-            ],
-            "default_root_object": "",
-            "domain_name": "d3d497dwhycahv.cloudfront.net",
-            "enabled": true,
-            "etag": "EPPTDIP4N0D1H",
-            "hosted_zone_id": "Z2FDTNDATAQYW2",
-            "http_version": "http2",
-            "id": "E1EFARXD2O1SGB",
-            "in_progress_validation_batches": 0,
-            "is_ipv6_enabled": true,
-            "last_modified_time": "2020-09-01 12:37:27.805 +0000 UTC",
-            "logging_config": [],
-            "ordered_cache_behavior": [],
-            "origin": [
-              {
-                "custom_header": [],
-                "custom_origin_config": [],
-                "domain_name": "ship-flow.s3.amazonaws.com",
-                "origin_id": "ship-flow.io-s3-origin",
-                "origin_path": "",
-                "s3_origin_config": []
-              }
-            ],
-            "origin_group": [],
-            "price_class": "PriceClass_All",
-            "restrictions": [
-              {
-                "geo_restriction": [
-                  {
-                    "locations": [],
-                    "restriction_type": "none"
-                  }
-                ]
-              }
-            ],
-            "retain_on_delete": false,
-            "status": "InProgress",
-            "tags": {},
-            "viewer_certificate": [
-              {
-                "acm_certificate_arn": "arn:aws:acm:us-east-1:748004005034:certificate/8b12c39d-f1cd-406a-811a-d64ec1813686",
-                "cloudfront_default_certificate": false,
-                "iam_certificate_id": "",
-                "minimum_protocol_version": "TLSv1.1_2016",
-                "ssl_support_method": "sni-only"
-              }
-            ],
-            "wait_for_deployment": true,
-            "web_acl_id": ""
-          },
-          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ=="
         }
       ]
     },
@@ -399,19 +277,19 @@
             "comment": "",
             "delegation_set_id": "",
             "force_destroy": false,
-            "id": "Z02003262XKHHY5VGBWKB",
+            "id": "Z01834482RHSNRC233YG8",
             "name": "ship-flow.io.",
             "name_servers": [
-              "ns-1000.awsdns-61.net",
-              "ns-1294.awsdns-33.org",
-              "ns-1954.awsdns-52.co.uk",
-              "ns-213.awsdns-26.com"
+              "ns-1517.awsdns-61.org",
+              "ns-1846.awsdns-38.co.uk",
+              "ns-284.awsdns-35.com",
+              "ns-598.awsdns-10.net"
             ],
             "tags": {},
             "vpc": [],
             "vpc_id": null,
             "vpc_region": null,
-            "zone_id": "Z02003262XKHHY5VGBWKB"
+            "zone_id": "Z01834482RHSNRC233YG8"
           },
           "private": "bnVsbA=="
         }
