@@ -7,11 +7,12 @@ import { Map } from 'mapbox-gl';
 interface ship {
   startLoc: string
   endLoc: string
-  startCoord: number[]
   endCoord: number[]
   endDate: Date
   vesselName: string
   weight: number
+  lonOffset: number
+  latOffset: number
 
   sourceData: any
   srcId: string
@@ -31,7 +32,7 @@ export class AppComponent implements OnInit {
   defaultCenter = [-98.585522, 39.8333333]; //[-77.0366, 38.895]; // Assumes Kansas!
 
   appTime = new Date('2020-6-30');
-  timeRate = 10;// clock seconds per app day
+  timeRate = 20;// clock seconds per app day
   updateRate = 20;// rerenders per second
   shipSpeed = 18; // 37 kph is approx 20 knots 
   daysToShow = 2; // number of days to show a ship for
@@ -85,19 +86,21 @@ export class AppComponent implements OnInit {
   }
 
   async initShipObj(startLoc, endLoc, endDate, vesselName, weight) {
-    const startCoord = await this.coord(startLoc);
     const endCoord = await this.coord(endLoc);
-    if (startCoord.length === 2 && endCoord.length === 2) {
+    const latOffset = 10 * (Math.random() - 0.5);
+    const lonOffset = 10 * (Math.random() - 0.5);
+    if (endCoord.length === 2) {
       return {
         startLoc: startLoc,
         endLoc: endLoc,
-        startCoord: startCoord,
         endCoord: endCoord,
         endDate: endDate,
         vesselName: vesselName,
         weight: weight,
 
-        sourceData: this.pointSource(startCoord, endCoord, endDate),
+        sourceData: this.pointSource(endCoord, endDate, lonOffset, latOffset),
+        latOffset: latOffset,
+        lonOffset: lonOffset,
         srcId: uuidv4(),
         ptId: uuidv4(),
         lineId: uuidv4(),
@@ -119,7 +122,7 @@ export class AppComponent implements OnInit {
   // lat/lon from a generic place name
   async coord(placeName: string) {
     let request = "https://api.mapbox.com/geocoding/v5/mapbox.places/";
-    request += placeName
+    request += placeName.replace('/', ''); //tiny bit of cleaning
     request += '.json';
     request += '?access_token=';
     request += this.accessToken;
@@ -142,24 +145,8 @@ export class AppComponent implements OnInit {
     return endDate > this.appTime && startDate < this.appTime;
   }
 
-  lineSource(startCoord, endCoord) {
-    return {
-      type: 'geojson',
-      data: {
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'LineString',
-          coordinates: [
-            startCoord,
-            endCoord
-          ]
-        }
-      }
-    };
-  }
 
-  shipCoord(startCoord, endCoord, endDate: Date) {
+  shipCoord(endCoord, endDate: Date, lonOffset, latOffset) {
     const D = this.shipSpeed * this.daysToShow * 24; // km total over days to show
 
     const totalDeltaLon = endCoord[0] - this.defaultCenter[0];
@@ -178,15 +165,12 @@ export class AppComponent implements OnInit {
     const daysLeft = (endDate.getTime() - this.appTime.getTime()) / (24 * 3600 * 1000);
     const pct = daysLeft / this.daysToShow;
 
-
-    //const lonSign = endCoord[0] > this.defaultCenter[0] ? -1 : 1;
-    //lonSign * deltaLon * pct,
-    return [endCoord[0] + deltaLon * pct, endCoord[1] + deltaLat * pct];
+    return [endCoord[0] + (deltaLon + lonOffset) * pct, endCoord[1] + (deltaLat + latOffset) * pct];
   }
 
-  pointSource(startCoord, endCoord, endDate) {
+  pointSource(endCoord, endDate, lonOffset, latOffset) {
 
-    const curCoord = this.shipCoord(startCoord, endCoord, endDate);
+    const curCoord = this.shipCoord(endCoord, endDate, lonOffset, latOffset);
     const ret = {
       type: 'Point',
       coordinates: curCoord
@@ -198,7 +182,7 @@ export class AppComponent implements OnInit {
     for (let i in this.shipArr) {
       const curObj = this.shipArr[i]
       const ret = { ...curObj };
-      this.shipArr[i].sourceData = this.pointSource(ret.startCoord, ret.endCoord, ret.endDate);
+      this.shipArr[i].sourceData = this.pointSource(ret.endCoord, ret.endDate, ret.lonOffset, ret.latOffset);
     }
   }
 
@@ -208,11 +192,9 @@ export class AppComponent implements OnInit {
   }
 
   circleEnter(shipIdx: number) {
-    console.log(shipIdx);
     this.shipArr[shipIdx].showPopup = true;
   }
   circleExit(shipIdx: number) {
-    console.log(shipIdx);
     this.shipArr[shipIdx].showPopup = false;
   }
 
