@@ -231,6 +231,11 @@ export class AppComponent implements OnInit {
     this.shipArr[shipIdx].showPopup = false;
   }
 
+  getAppTime() {
+    console.log(this.appTime.getTimezoneOffset());
+    return this.appTime.toUTCString();
+  }
+
   // Not yet used but could be useful.
   // saveMap(map: Map) {
   //   this.map = map;
