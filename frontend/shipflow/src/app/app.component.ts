@@ -36,8 +36,8 @@ export class AppComponent implements OnInit {
   appTime = new Date('2020-1-1');
   minDate = new Date('2020-1-1');
   maxDate = new Date('2020-08-23');
-  timeRate = 10;// clock seconds per app day
-  updateRate = 5;// rerenders per second
+  timeRate = .1;// clock seconds per app day
+  updateRate = 10;// rerenders per second
   shipSpeed = 18; // 37 kph is approx 20 knots 
   daysToShow = 2; // number of days to show a ship for
   paused = false;
@@ -49,6 +49,9 @@ export class AppComponent implements OnInit {
   faPause = faPause;
   faShip = faShip;
   faPlay = faPlay;
+
+  slider = 10;
+  slideClickState = 0;
   constructor() {
 
   }
@@ -59,7 +62,7 @@ export class AppComponent implements OnInit {
     setInterval(() => { this.updateAppTime() }, 1000 / this.updateRate)
 
     // 
-    this.debugFetchArray();
+    //this.debugFetchArray();
 
   }
 
@@ -75,11 +78,10 @@ export class AppComponent implements OnInit {
     this.shipArr.push(testObj3);
   }
 
-  async debugFetchArray() {
+  async initFetchArray() {
 
     const dateToFetch = new Date(this.appTime.getTime() + this.daysToShow * 24 * 3600 * 1000);
     const dateStrToFetch = `${dateToFetch.getFullYear()}-${dateToFetch.getMonth() + 1}-${dateToFetch.getDate()}`;
-    console.log(dateStrToFetch);
 
     const resp = await fetch(`https://cq2lqs0ov8.execute-api.us-east-1.amazonaws.com/prod/${dateStrToFetch}`);
     const respJson = await resp.json();
@@ -139,9 +141,17 @@ export class AppComponent implements OnInit {
   updateAppTime() {
     if (!this.paused) {
       const curTime = this.appTime.getTime();
-      const newTime = curTime + 24 * 3600 * 1000 / this.updateRate / this.timeRate;
-      this.appTime = new Date(newTime);
-      this.updateShips();
+      const newTimeMs = curTime + 24 * 3600 * 1000 / this.updateRate / this.timeRate;
+      const newTimeObj = new Date(newTimeMs);
+      if (this.maxDate > newTimeObj) {
+        if (this.slideClickState === 0) {
+          this.slider = 100 * (newTimeMs - this.minDate.getTime()) / (this.maxDate.getTime() - this.minDate.getTime())
+        }
+
+        this.appTime = newTimeObj
+        this.updateShips();
+      }
+
     }
 
   }
@@ -232,9 +242,34 @@ export class AppComponent implements OnInit {
   }
 
   getAppTime() {
-    console.log(this.appTime.getTimezoneOffset());
     return this.appTime.toUTCString();
   }
+
+
+
+  mouseDown() {
+    this.slideClickState = 1;
+
+  }
+
+  mouseUp() {
+    if (this.slideClickState === 1) {
+      this.slideClickState = 2;
+    }
+  }
+
+  sliderChange(ev) {
+    this.paused = false;
+    if (this.slideClickState === 2) {
+      const totalMs = this.maxDate.getTime() - this.minDate.getTime();
+      this.appTime = new Date(this.minDate.getTime() + totalMs * this.slider / 100)
+      this.slideClickState = 0;
+
+    }
+
+
+  }
+
 
   // Not yet used but could be useful.
   // saveMap(map: Map) {

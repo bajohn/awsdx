@@ -1,84 +1,87 @@
-<div class="top-bar">
-  <mat-grid-list cols="8" rowHeight="40px">
+<div (mouseup)="mouseUp()">
+  <div class="top-bar">
+    <mat-grid-list cols="8" rowHeight="40px">
 
-    <mat-grid-tile [colspan]="3" [rowspan]="1">
-      <fa-icon [icon]="faShip" size="2x" class="icon-style"></fa-icon>
-      <div class="logo">
-        ShipFlow
-      </div>
-    </mat-grid-tile>
-
-    <mat-grid-tile [colspan]="1" [rowspan]="1" class="clickable"  (click)="pauseClick()">
-
-      <fa-icon [icon]="faPause" size="2x" class="icon-style" *ngIf="!paused"></fa-icon>
-      <fa-icon [icon]="faPlay" size="2x" class="icon-style" *ngIf="paused"></fa-icon>
-    </mat-grid-tile>
-
-    <mat-grid-tile [colspan]="1" [rowspan]="1">
-      {{getAppTime()}}
-    </mat-grid-tile>
-
-    <mat-grid-tile [colspan]="1" [rowspan]="1">
-      <!-- <mat-spinner></mat-spinner> -->
-    </mat-grid-tile>
-
-  </mat-grid-list>
-</div>
-
-
-<mgl-map class="mapbox-container" [style]="'mapbox://styles/mapbox/streets-v9'" [zoom]="[2]"
-  [center]=defaultCenter>
-
-  <ng-container *ngFor="let obj of shipArr; index as i;">
-
-    <ng-container *ngIf="showGraphics(obj.endDate)">
-
-      <mgl-geojson-source [id]="obj.srcId" [data]="obj.sourceData"> </mgl-geojson-source>
-      <mgl-layer (mouseEnter)="circleEnter(i)" (mouseLeave)="circleExit(i)" [id]="obj.ptId" type="circle"
-        [source]="obj.srcId" [paint]="{
-        'circle-radius': 3,
-        'circle-color': 'red'
-      }"> </mgl-layer>
-      <mgl-popup [lngLat]="obj.sourceData.coordinates" [closeOnClick]="true" *ngIf="obj.showPopup">
-        <div>
-          Vessel:
-          {{obj.vesselName}}
+      <mat-grid-tile [colspan]="3" [rowspan]="1">
+        <fa-icon [icon]="faShip" size="2x" class="icon-style"></fa-icon>
+        <div class="logo">
+          ShipFlow
         </div>
-        <div>
-          IMO ID:
-          {{obj.imoNumber}}
-        </div>
-        <div>
-          Weight:
-          {{ obj.weight  }} kg
-        </div>
-        <div>
-          Origin:
-          {{ obj.startLoc  }}
-        </div>
+      </mat-grid-tile>
 
-        <div>
-          Destination:
-          {{ obj.endLoc  }}
-        </div>
+      <mat-grid-tile [colspan]="1" [rowspan]="1" class="clickable" (click)="pauseClick()">
+
+        <fa-icon [icon]="faPause" size="2x" class="icon-style" *ngIf="!paused"></fa-icon>
+        <fa-icon [icon]="faPlay" size="2x" class="icon-style" *ngIf="paused"></fa-icon>
+      </mat-grid-tile>
+
+      <mat-grid-tile [colspan]="1" [rowspan]="1">
+        {{getAppTime()}}
+      </mat-grid-tile>
+
+      <mat-grid-tile [colspan]="2" [rowspan]="1">
+        <mat-slider  (mousedown)="mouseDown()" (change)="sliderChange($event)" [(ngModel)]="slider"></mat-slider>
+        <!-- <mat-spinner></mat-spinner> -->
+      </mat-grid-tile>
+
+    </mat-grid-list>
+  </div>
+
+
+  <mgl-map class="mapbox-container" [style]="'mapbox://styles/mapbox/streets-v9'" [zoom]="[2]" [center]=defaultCenter>
+
+    <ng-container *ngFor="let obj of shipArr; index as i;">
+
+      <ng-container *ngIf="showGraphics(obj.endDate)">
+
+        <mgl-geojson-source [id]="obj.srcId" [data]="obj.sourceData"> </mgl-geojson-source>
+        <mgl-layer (mouseEnter)="circleEnter(i)" (mouseLeave)="circleExit(i)" [id]="obj.ptId" type="circle"
+          [source]="obj.srcId" [paint]="{
+          'circle-radius': 3,
+          'circle-color': 'red'
+        }"> </mgl-layer>
+        <mgl-popup [lngLat]="obj.sourceData.coordinates" [closeOnClick]="true" *ngIf="obj.showPopup">
+          <div>
+            Vessel:
+            {{obj.vesselName}}
+          </div>
+          <div>
+            IMO ID:
+            {{obj.imoNumber}}
+          </div>
+          <div>
+            Weight:
+            {{ obj.weight  }} kg
+          </div>
+          <div>
+            Origin:
+            {{ obj.startLoc  }}
+          </div>
+
+          <div>
+            Destination:
+            {{ obj.endLoc  }}
+          </div>
 
 
 
-      </mgl-popup>
+        </mgl-popup>
 
-      <!-- <mgl-layer id="obj.lineId" type="line" [source]="lineSource(obj.startCoord, obj.endCoord)" [layout]="{
-        'line-join': 'round',
-        'line-cap': 'round'
-      }" [paint]="{
-        'line-color': '#888',
-        'line-width': 8
-      }">
-    </mgl-layer> -->
+        <!-- <mgl-layer id="obj.lineId" type="line" [source]="lineSource(obj.startCoord, obj.endCoord)" [layout]="{
+          'line-join': 'round',
+          'line-cap': 'round'
+        }" [paint]="{
+          'line-color': '#888',
+          'line-width': 8
+        }">
+      </mgl-layer> -->
+
+      </ng-container>
+
 
     </ng-container>
 
 
-  </ng-container>
 
 
 
@@ -86,6 +89,5 @@
 
 
 
-
-
-</mgl-map>
+  </mgl-map>
+</div>
