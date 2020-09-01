@@ -9,7 +9,7 @@ interface ship {
   startLoc: string
   endLoc: string
   endCoord: number[]
-  endDate: Date
+  endDate: Date // date of arrival
   vesselName: string
   weight: number
   imoNumber: number
@@ -33,10 +33,10 @@ export class AppComponent implements OnInit {
 
   // Main map params
   defaultCenter = [-98.585522, 39.8333333]; //[-77.0366, 38.895]; // Assumes Kansas!
-  appTime = new Date('2020-2-1');
+  appTime = new Date('2020-1-1');
   minDate = new Date('2020-1-1');
   maxDate = new Date('2020-08-23');
-  timeRate = 20;// clock seconds per app day
+  timeRate = 10;// clock seconds per app day
   updateRate = 5;// rerenders per second
   shipSpeed = 18; // 37 kph is approx 20 knots 
   daysToShow = 2; // number of days to show a ship for
@@ -59,11 +59,12 @@ export class AppComponent implements OnInit {
     setInterval(() => { this.updateAppTime() }, 1000 / this.updateRate)
 
     // 
-    //this.debugFetchArray();
+    this.debugFetchArray();
 
   }
 
   async debugArray() {
+
     const endDate = new Date();
     const testObj1 = await this.initShipObj('taipei', 'Seattle', endDate, 'boaty mcmboatface', 724, 9337468);
     const testObj2 = await this.initShipObj('tokyo', 'los angeles', endDate, 'SWLV', 40923, 9318163);
@@ -75,7 +76,12 @@ export class AppComponent implements OnInit {
   }
 
   async debugFetchArray() {
-    const resp = await fetch('https://cq2lqs0ov8.execute-api.us-east-1.amazonaws.com/prod/2020-07-01');
+
+    const dateToFetch = new Date(this.appTime.getTime() + this.daysToShow * 24 * 3600 * 1000);
+    const dateStrToFetch = `${dateToFetch.getFullYear()}-${dateToFetch.getMonth() + 1}-${dateToFetch.getDate()}`;
+    console.log(dateStrToFetch);
+
+    const resp = await fetch(`https://cq2lqs0ov8.execute-api.us-east-1.amazonaws.com/prod/${dateStrToFetch}`);
     const respJson = await resp.json();
     const promiseArr = [];
     for (const key of Object.keys(respJson)) {
@@ -202,17 +208,21 @@ export class AppComponent implements OnInit {
   }
 
   updateShips() {
-    for (let i in this.shipArr) {
+
+    // iterate backwards to allow deletion in-place
+    for (let i = this.shipArr.length - 1; i >= 0; i--) {
       const curObj = this.shipArr[i]
-      const ret = { ...curObj };
-      this.shipArr[i].sourceData = this.pointSource(ret.endCoord, ret.endDate, ret.lonOffset, ret.latOffset);
+      if (curObj.endDate < this.appTime) {
+        // delete completed journey
+        this.shipArr.splice(i, 1);
+      } else {
+        this.shipArr[i].sourceData = this.pointSource(curObj.endCoord, curObj.endDate, curObj.lonOffset, curObj.latOffset);
+
+      }
     }
   }
 
-  // Not yet used but could be useful.
-  // saveMap(map: Map) {
-  //   this.map = map;
-  // }
+
 
   circleEnter(shipIdx: number) {
     this.shipArr[shipIdx].showPopup = true;
@@ -220,6 +230,11 @@ export class AppComponent implements OnInit {
   circleExit(shipIdx: number) {
     this.shipArr[shipIdx].showPopup = false;
   }
+
+  // Not yet used but could be useful.
+  // saveMap(map: Map) {
+  //   this.map = map;
+  // }
 
 }
 
