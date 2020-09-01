@@ -3,7 +3,9 @@
   {{appTime}}
 </div>
 
-
+<div (click)="pauseClick()">
+  Pause
+</div>
 <mgl-map (load)="saveMap($event)" class="mapbox-container" [style]="'mapbox://styles/mapbox/streets-v9'" [zoom]="[2]"
   [center]=defaultCenter>
 
@@ -23,17 +25,21 @@
           {{obj.vesselName}}
         </div>
         <div>
+          IMO ID:
+          {{obj.imoNumber}}
+        </div>
+        <div>
           Weight:
           {{ obj.weight  }} kg
         </div>
         <div>
           Origin:
-          {{ obj.startLoc  }} kg
+          {{ obj.startLoc  }} 
         </div>
 
         <div>
           Destination:
-          {{ obj.endLoc  }} kg
+          {{ obj.endLoc  }} 
         </div>
 
 

@@ -11,6 +11,7 @@ interface ship {
   endDate: Date
   vesselName: string
   weight: number
+  imoNumber: number
   lonOffset: number
   latOffset: number
 
@@ -33,10 +34,11 @@ export class AppComponent implements OnInit {
 
   appTime = new Date('2020-6-30');
   timeRate = 20;// clock seconds per app day
-  updateRate = 20;// rerenders per second
+  updateRate = 5;// rerenders per second
   shipSpeed = 18; // 37 kph is approx 20 knots 
   daysToShow = 2; // number of days to show a ship for
 
+  paused = false;
   map: Map;
 
   shipArr: ship[] = [];
@@ -58,9 +60,9 @@ export class AppComponent implements OnInit {
 
   async debugArray() {
     const endDate = new Date();
-    const testObj1 = await this.initShipObj('taipei', 'Seattle', endDate, 'boaty mcmboatface', 724);
-    const testObj2 = await this.initShipObj('tokyo', 'los angeles', endDate, 'SWLV', 40923);
-    const testObj3 = await this.initShipObj('Nhava Sheva,India', 'New York Newark Area, Newark, New Jersey', endDate, 'MAERSK', 82505923042);
+    const testObj1 = await this.initShipObj('taipei', 'Seattle', endDate, 'boaty mcmboatface', 724, 9337468);
+    const testObj2 = await this.initShipObj('tokyo', 'los angeles', endDate, 'SWLV', 40923, 9318163);
+    const testObj3 = await this.initShipObj('Nhava Sheva,India', 'New York Newark Area, Newark, New Jersey', endDate, 'MAERSK', 82505923042, 9462720);
 
     this.shipArr.push(testObj1);
     this.shipArr.push(testObj2);
@@ -74,7 +76,15 @@ export class AppComponent implements OnInit {
     for (const key of Object.keys(respJson)) {
       const curObj = respJson[key];
 
-      promiseArr.push(this.initShipObj(curObj['foreign_port_of_lading'], curObj['port_of_unlading'], new Date(curObj['actual_arrival_date']), key, curObj['total_weight']));
+      promiseArr.push(this.initShipObj(
+        curObj['foreign_port_of_lading'],
+        curObj['port_of_unlading'],
+        new Date(curObj['actual_arrival_date']),
+        key,
+        curObj['total_weight'],
+        curObj['conveyance_id'],
+      )
+      );
     }
     const ships = await Promise.all(promiseArr);
 
@@ -85,7 +95,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  async initShipObj(startLoc, endLoc, endDate, vesselName, weight) {
+  async initShipObj(startLoc, endLoc, endDate, vesselName, weight, imoNumber) {
     const endCoord = await this.coord(endLoc);
     const latOffset = 10 * (Math.random() - 0.5);
     const lonOffset = 10 * (Math.random() - 0.5);
@@ -97,6 +107,7 @@ export class AppComponent implements OnInit {
         endDate: endDate,
         vesselName: vesselName,
         weight: weight,
+        imoNumber: imoNumber,
 
         sourceData: this.pointSource(endCoord, endDate, lonOffset, latOffset),
         latOffset: latOffset,
@@ -110,11 +121,18 @@ export class AppComponent implements OnInit {
 
   }
 
+  pauseClick(){
+    this.paused = !this.paused;
+  }
+
   updateAppTime() {
-    const curTime = this.appTime.getTime();
-    const newTime = curTime + 24 * 3600 * 1000 / this.updateRate / this.timeRate;
-    this.appTime = new Date(newTime);
-    this.updateShips();
+    if (!this.paused) {
+      const curTime = this.appTime.getTime();
+      const newTime = curTime + 24 * 3600 * 1000 / this.updateRate / this.timeRate;
+      this.appTime = new Date(newTime);
+      this.updateShips();
+    }
+
   }
 
 
