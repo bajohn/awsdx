@@ -3,7 +3,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Map } from 'mapbox-gl';
-import { faCoffee, faPause, faShip} from '@fortawesome/free-solid-svg-icons';
+import { faCoffee, faPause, faShip, faPlay } from '@fortawesome/free-solid-svg-icons';
 
 interface ship {
   startLoc: string
@@ -30,23 +30,25 @@ interface ship {
 })
 export class AppComponent implements OnInit {
   readonly accessToken = 'pk.eyJ1IjoiYnJlbmRhbmFqb2huIiwiYSI6ImNrZWM1aHkwZjA0YzIydHJzaTdudHA5cjQifQ.ogTyplFS7LdAC7QspnVVkQ';
-  testPoint: GeoJSON.Point = { type: 'Point', coordinates: [0, 0] };
-  defaultCenter = [-98.585522, 39.8333333]; //[-77.0366, 38.895]; // Assumes Kansas!
 
-  appTime = new Date('2020-6-30');
+  // Main map params
+  defaultCenter = [-98.585522, 39.8333333]; //[-77.0366, 38.895]; // Assumes Kansas!
+  appTime = new Date('2020-2-1');
+  minDate = new Date('2020-1-1');
+  maxDate = new Date('2020-08-23');
   timeRate = 20;// clock seconds per app day
   updateRate = 5;// rerenders per second
   shipSpeed = 18; // 37 kph is approx 20 knots 
   daysToShow = 2; // number of days to show a ship for
-
   paused = false;
-  map: Map;
+
+
 
   shipArr: ship[] = [];
 
   faPause = faPause;
-  faShip = faShip
-
+  faShip = faShip;
+  faPlay = faPlay;
   constructor() {
 
   }
@@ -124,7 +126,7 @@ export class AppComponent implements OnInit {
 
   }
 
-  pauseClick(){
+  pauseClick() {
     this.paused = !this.paused;
   }
 
@@ -208,9 +210,9 @@ export class AppComponent implements OnInit {
   }
 
   // Not yet used but could be useful.
-  saveMap(map: Map) {
-    this.map = map;
-  }
+  // saveMap(map: Map) {
+  //   this.map = map;
+  // }
 
   circleEnter(shipIdx: number) {
     this.shipArr[shipIdx].showPopup = true;

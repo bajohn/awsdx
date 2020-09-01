@@ -1,16 +1,17 @@
 <div class="top-bar">
   <mat-grid-list cols="8" rowHeight="40px">
 
-    <mat-grid-tile [colspan]="3" [rowspan]="1" (click)="pauseClick()">
+    <mat-grid-tile [colspan]="3" [rowspan]="1">
       <fa-icon [icon]="faShip" size="2x" class="icon-style"></fa-icon>
       <div class="logo">
         ShipFlow
       </div>
     </mat-grid-tile>
 
-    <mat-grid-tile [colspan]="1" [rowspan]="1">
+    <mat-grid-tile [colspan]="1" [rowspan]="1" class="clickable"  (click)="pauseClick()">
 
-      <fa-icon [icon]="faPause" size="2x" class="icon-style"></fa-icon>
+      <fa-icon [icon]="faPause" size="2x" class="icon-style" *ngIf="!paused"></fa-icon>
+      <fa-icon [icon]="faPlay" size="2x" class="icon-style" *ngIf="paused"></fa-icon>
     </mat-grid-tile>
 
     <mat-grid-tile [colspan]="1" [rowspan]="1">
@@ -18,14 +19,14 @@
     </mat-grid-tile>
 
     <mat-grid-tile [colspan]="1" [rowspan]="1">
-      <mat-spinner></mat-spinner>
+      <!-- <mat-spinner></mat-spinner> -->
     </mat-grid-tile>
 
   </mat-grid-list>
 </div>
 
 
-<mgl-map (load)="saveMap($event)" class="mapbox-container" [style]="'mapbox://styles/mapbox/streets-v9'" [zoom]="[2]"
+<mgl-map class="mapbox-container" [style]="'mapbox://styles/mapbox/streets-v9'" [zoom]="[2]"
   [center]=defaultCenter>
 
   <ng-container *ngFor="let obj of shipArr; index as i;">

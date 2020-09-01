@@ -6,16 +6,21 @@
 }
 
 .top-bar {
-    background-color: #10161d
+    background-color: #10161d;
+    color: #f44336;
 }
 
-.icon-style {
-    color: #f44336
-}
+/* .icon-style {
+ 
+} */
 
 .logo {
     font-size: 30px;
-    color: #f44336;
 }
+
+.clickable {
+    cursor: pointer;
+}
+
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
