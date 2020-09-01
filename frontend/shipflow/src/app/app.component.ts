@@ -36,13 +36,13 @@ export class AppComponent implements OnInit {
   appTime = new Date('2020-1-1');
   minDate = new Date('2020-1-1');
   maxDate = new Date('2020-08-23');
-  timeRate = 20;// clock seconds per app day
-  updateRate = 5;// rerenders per second
+  timeRate = 45;// clock seconds per app day
+  updateRate = 1;// rerenders per second
   shipSpeed = 18; // 37 kph is approx 20 knots 
   daysToShow = 3; // number of days to show a ship for
   paused = false;
   showAbout = false;
-  
+  loading = true;
 
 
   shipArr: ship[] = [];
@@ -82,14 +82,16 @@ export class AppComponent implements OnInit {
   }
 
   doPull(firstDate, daysToPull) {
+    this.loading = true;
     let curDate = new Date(firstDate.getTime());
     while (daysToPull > 0) {
-      //this.shipsFromApi(curDate);
+      this.shipsFromApi(curDate);
 
 
       curDate = new Date(curDate.getTime() + 24 * 3600 * 1000);
       daysToPull--;
     }
+
   }
 
   async shipsFromApi(dateToPull: Date) {
@@ -121,6 +123,7 @@ export class AppComponent implements OnInit {
         this.shipArr.push(ship);
       }
     }
+    this.loading = false;
   }
 
   async initShipObj(startLoc, endLoc, endDate, vesselName, weight, imoNumber) {
